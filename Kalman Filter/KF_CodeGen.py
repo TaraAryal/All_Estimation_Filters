@@ -1,8 +1,29 @@
+# File name:		KF_CodeGen.py
+# Written by:		Niranjan Bhujel
+# Date:			    28-December-2021
+# Description:	    File to generate C code for KF
+
+
 import casadi as ca
 from pynlcontrol import Estimator, BasicUtils
 
 
 def Fc(x, u):
+    """
+    Function that returns right hand side of state equations
+
+    Parameters
+    ----------
+    x : ca.SX.sym array
+        State vector
+    u : ca.SX.sym array
+        Control input vector
+
+    Returns
+    -------
+    ca.SX.sym
+        Right hand side of state equation
+    """
     x1 = x[0]
     x2 = x[1]
     x3 = x[2]
@@ -23,6 +44,21 @@ def Fc(x, u):
 
 
 def Hc(x):
+    """
+    Function that returns measurement variable in terms of x.
+
+    Parameters
+    ----------
+    x : ca.SX.sym array
+        State vector
+
+    Returns
+    -------
+    ca.SX.sym
+        Measurement variable
+
+    Measurement in this case is $\Delta\omega$ only which is second state variable.
+    """
     return x[1]
 
 # A, B, C and D matrices
@@ -61,4 +97,9 @@ KF_Func = ca.Function(
     InName + ['Q11', 'Q22', 'Q33'] + ['R'],
     OutName
 )
-BasicUtils.Gen_Code(KF_Func, 'KF_Code', mex=False, printhelp=True)
+BasicUtils.Gen_Code(
+    func=KF_Func,
+    filename='KF_Code',
+    mex=False,
+    printhelp=True
+)

@@ -1,13 +1,37 @@
+# File name:		UKF_CodeGen.py
+# Written by:		Niranjan Bhujel
+# Date:			    28-December-2021
+# Description:	    File to generate C code for UKF
+
+
 import casadi as ca
 from pynlcontrol import Estimator, BasicUtils
 
 
 def Fc(x, u):
+    """
+    Function that returns right hand side of state equations
+
+    Parameters
+    ----------
+    x : ca.SX.sym array
+        State vector
+    u : ca.SX.sym array
+        Control input vector
+
+    Returns
+    -------
+    ca.SX.sym
+        Right hand side of state equation
+
+    Parameters to be estimated are also augmented as states whose derivative is zero 
+    """
     x1 = x[0]
     x2 = x[1]
     x3 = x[2]
     M = x[3]
     D = x[4]
+
     u = u[0]
 
     Ki = 2.0
@@ -23,7 +47,22 @@ def Fc(x, u):
     )
 
 
-def Hc(x, u):
+def Hc(x):
+    """
+    Function that returns measurement variable in terms of x.
+
+    Parameters
+    ----------
+    x : ca.SX.sym array
+        State vector
+
+    Returns
+    -------
+    ca.SX.sym
+        Measurement variable
+
+    Measurement in this case is $\Delta\omega$ only which is second state variable.
+    """
     return x[1]
 
 
@@ -49,4 +88,9 @@ UKF_Func = ca.Function(
     OutName
 )
 
-BasicUtils.Gen_Code(UKF_Func, 'UKF_Code', mex=False, printhelp=True)
+BasicUtils.Gen_Code(
+    func=UKF_Func,
+    filename='UKF_Code',
+    mex=False,
+    printhelp=True
+)
